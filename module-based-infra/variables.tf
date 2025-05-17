@@ -11,9 +11,9 @@ variable "org_id" {
 }
 
 variable "folder_id" {
-  description = "The folder ID to create the project under. e.g. 'folders/123456789012'. Takes precedence over org_id if both are set for project factory module."
+  description = "Optional. The folder ID to create the project under (e.g., 'folders/123456789012'). If org_id is also set, the project factory module might prioritize folder_id or have specific behavior."
   type        = string
-  default     = null # Keeping null as a valid default, can be overridden
+  default     = null
 }
 
 variable "billing_account_id" {
@@ -25,7 +25,7 @@ variable "billing_account_id" {
 variable "dataset_names" {
   description = "A list of BigQuery dataset names to create."
   type        = list(string)
-  default = [ # Keeping this default as it's specific to the request
+  default = [
     "bqd_rls_100_source_data",
     "bqd_rls_200_authorized_views",
     "bqd_rls_300_rap_basic",
@@ -37,11 +37,11 @@ variable "dataset_names" {
 variable "default_region" {
   description = "Default region for resources."
   type        = string
-  default     = "us-central1" # Reasonable default
+  default     = "us-central1"
 }
 
 variable "default_bq_location" {
   description = "Default location for BigQuery datasets (e.g., US, EU, asia-northeast1)."
   type        = string
-  default     = "US" # Reasonable default
+  default     = "US"
 }

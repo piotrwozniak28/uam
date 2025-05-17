@@ -8,13 +8,13 @@ output "project_number" {
   value       = module.project_factory.project_number
 }
 
-output "bigquery_dataset_ids" {
+output "created_bigquery_dataset_ids" {
   description = "A list of created BigQuery dataset IDs."
-  value       = module.bigquery_datasets.dataset_ids
+  value       = [for ds_instance in module.bigquery_datasets : ds_instance.bigquery_dataset.dataset_id]
 }
 
-output "bigquery_datasets_map" {
-  description = "A map of created BigQuery datasets with their full details."
-  value       = module.bigquery_datasets.datasets
-  sensitive   = true # The module output might contain sensitive defaults
+output "created_bigquery_datasets_details" {
+  description = "A map of created BigQuery datasets, where keys are dataset names and values are the full module outputs for each dataset."
+  value       = module.bigquery_datasets
+  sensitive   = true
 }

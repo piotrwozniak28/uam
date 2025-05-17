@@ -1,6 +1,6 @@
 output "project_id" {
   description = "The ID of the created GCP project."
-  value       = var.gcp_project_id # This will be the same as input for the resource version
+  value       = var.project_id # This will be the same as input for the resource version
   # For the module version, we'll override this in its specific outputs.tf
 }
 

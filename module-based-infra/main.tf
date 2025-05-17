@@ -3,17 +3,16 @@ module "project_factory" {
   source  = "terraform-google-modules/project-factory/google"
   version = "18.0.0"
 
-  name                        = var.gcp_project_id # This becomes the project_id
-  random_project_id           = false              # We are providing a specific ID
-  org_id                      = var.org_id
-  folder_id                   = var.folder_id
-  billing_account             = var.billing_account_id
-  default_service_account     = "deprivileged" # "keep", "disable", "delete", "deprivileged"
+  name              = var.gcp_project_id
+  random_project_id = false
+  org_id            = var.org_id # Explicitly set the organization
+  # folder_id         = var.folder_id # If set, project_factory usually prefers folder_id if both are set
+  billing_account = var.billing_account_id
+  # default_service_account     = "deprivileged"
   disable_services_on_destroy = false
 
   activate_apis = [
     "bigquery.googleapis.com",
-    # Add other APIs if needed, e.g., "compute.googleapis.com"
   ]
 
   labels = {
@@ -21,35 +20,25 @@ module "project_factory" {
     managed-by  = "terraform-module"
   }
 
-  # It's good practice to explicitly disable the default network if not needed
   auto_create_network = false
 }
 
 # 2. Create BigQuery Datasets using the BigQuery module
+# We will create one module instance for each dataset name.
 module "bigquery_datasets" {
+  for_each = toset(var.dataset_names) # Iterate over each dataset name
+
   source  = "terraform-google-modules/bigquery/google"
   version = "10.1.0"
 
-  project_id = module.project_factory.project_id # Use the output from the project factory
-  location   = var.default_bq_location           # Default location for all datasets
+  project_id  = module.project_factory.project_id
+  dataset_id  = each.value
+  location    = var.default_bq_location
+  description = "Dataset ${each.value} managed by Terraform BigQuery module"
 
-  # Define datasets. The module expects a map of dataset objects.
-  # We can construct this dynamically.
-  datasets = {
-    for ds_name in var.dataset_names : ds_name => {
-      dataset_id    = ds_name
-      friendly_name = ds_name
-      description   = "Dataset ${ds_name} managed by Terraform BigQuery module"
-      # location can be overridden per dataset if needed, otherwise uses module-level location
-      # location                 = "EU"
-      default_table_expiration_ms = null # No default expiration
-      labels = {
-        environment = "data-platform"
-        managed-by  = "terraform-module"
-      }
-    }
+  dataset_labels = {
+    environment = "data-platform"
+    managed-by  = "terraform-module"
+    dataset     = each.value
   }
-
-  # The BigQuery module handles dependencies internally if APIs are enabled by project_factory
-  # or if you ensure APIs are active before this module runs.
 }
