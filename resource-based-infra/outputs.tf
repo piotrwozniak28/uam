@@ -3,7 +3,7 @@ output "project_id" {
   value       = "prj-tpcds-${random_string.this.result}"
 }
 
-# output "bigquery_dataset_ids" {
-#   description = "A list of created BigQuery dataset IDs."
-#   value       = null # This will be populated by each version's main.tf or specific outputs.tf
-# }
+output "bigquery_dataset_ids" {
+  description = "A list of created BigQuery dataset IDs."
+  value       = [for k in google_bigquery_dataset.this : k.dataset_id]
+}

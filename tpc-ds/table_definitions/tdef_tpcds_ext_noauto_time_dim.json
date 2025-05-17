@@ -1,0 +1,63 @@
+{
+  "csvOptions": {
+    "allowJaggedRows": false,
+    "allowQuotedNewlines": false,
+    "encoding": "UTF-8",
+    "fieldDelimiter": "|",
+    "preserveAsciiControlCharacters": false,
+    "quote": "\"",
+    "skipLeadingRows": 0
+  },
+  "schema": {
+    "fields": [
+      {
+        "name": "t_time_sk",
+        "type": "INTEGER"
+      },
+      {
+        "name": "t_time_id",
+        "type": "STRING"
+      },
+      {
+        "name": "t_time",
+        "type": "INTEGER"
+      },
+      {
+        "name": "t_hour",
+        "type": "INTEGER"
+      },
+      {
+        "name": "t_minute",
+        "type": "INTEGER"
+      },
+      {
+        "name": "t_second",
+        "type": "INTEGER"
+      },
+      {
+        "name": "t_am_pm",
+        "type": "STRING"
+      },
+      {
+        "name": "t_shift",
+        "type": "STRING"
+      },
+      {
+        "name": "t_sub_shift",
+        "type": "STRING"
+      },
+      {
+        "name": "t_meal_time",
+        "type": "STRING"
+      },
+      {
+        "name": "test",
+        "type": "BOOL"
+      }
+    ]
+  },
+  "sourceFormat": "CSV",
+  "sourceUris": [
+    "gs://bkt-alk-tpcds-010/1gb/time_dim/*"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "csvOptions": {
+    "allowJaggedRows": false,
+    "allowQuotedNewlines": false,
+    "encoding": "UTF-8",
+    "fieldDelimiter": "|",
+    "preserveAsciiControlCharacters": false,
+    "quote": "\"",
+    "skipLeadingRows": 0
+  },
+  "schema": {
+    "fields": [
+      {
+        "name": "hd_demo_sk",
+        "type": "INTEGER"
+      },
+      {
+        "name": "hd_income_band_sk",
+        "type": "INTEGER"
+      },
+      {
+        "name": "hd_buy_potential",
+        "type": "STRING"
+      },
+      {
+        "name": "hd_dep_count",
+        "type": "INTEGER"
+      },
+      {
+        "name": "hd_vehicle_count",
+        "type": "INTEGER"
+      },
+      {
+        "name": "test",
+        "type": "BOOL"
+      }
+    ]
+  },
+  "sourceFormat": "CSV",
+  "sourceUris": [
+    "gs://bkt-alk-tpcds-010/1gb/household_demographics/*"
+  ]
+}

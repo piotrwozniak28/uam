@@ -34,6 +34,13 @@ resource "google_project_service" "storage_api" {
   disable_on_destroy         = false
 }
 
+resource "google_project_service" "datalineage_api" {
+  project                    = google_project.this.project_id
+  service                    = "datalineage.googleapis.com"
+  disable_dependent_services = false
+  disable_on_destroy         = false
+}
+
 resource "google_bigquery_dataset" "this" {
   for_each = toset(var.bq_dataset_names)
 
@@ -180,6 +187,45 @@ resource "local_file" "tpc_ds_script" {
     project_id  = google_project.this.project_id
     bucket_name = google_storage_bucket.default.name
   })
-  filename        = "${path.module}/templates/tpc_ds.sh"
+  filename        = "${path.module}/templates/tpc_ds.tmp.sh"
+  file_permission = "0755"
+}
+
+resource "local_file" "tpc_ds_script1" {
+  content = templatefile("${path.module}/templates/tpc_ds_load_native_noauto.tftpl", {
+    project_id  = google_project.this.project_id
+    bucket_name = google_storage_bucket.default.name
+    bigquery_dataset_id = [
+      for dataset_id in var.bq_dataset_names : dataset_id
+      if can(regex(".*tpcds.*", dataset_id))
+    ][0]
+  })
+  filename        = "${path.module}/templates/tpc_ds_load_native_noauto.tmp.sh"
+  file_permission = "0755"
+}
+
+resource "local_file" "tpc_ds_script2" {
+  content = templatefile("${path.module}/templates/row_counts_1_gb_meta.tftpl", {
+    project_id  = google_project.this.project_id
+    bucket_name = google_storage_bucket.default.name
+    bigquery_dataset_id = [
+      for dataset_id in var.bq_dataset_names : dataset_id
+      if can(regex(".*tpcds.*", dataset_id))
+    ][0]
+  })
+  filename        = "${path.module}/templates/row_counts_1_gb_meta.tmp.sql"
+  file_permission = "0755"
+}
+
+resource "local_file" "tpc_ds_script3" {
+  content = templatefile("${path.module}/templates/row_counts_1_gb.tftpl", {
+    project_id  = google_project.this.project_id
+    bucket_name = google_storage_bucket.default.name
+    bigquery_dataset_id = [
+      for dataset_id in var.bq_dataset_names : dataset_id
+      if can(regex(".*tpcds.*", dataset_id))
+    ][0]
+  })
+  filename        = "${path.module}/templates/row_counts_1_gb.tmp.sql"
   file_permission = "0755"
 }
