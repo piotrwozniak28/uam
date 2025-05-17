@@ -1,6 +1,6 @@
 resource "google_project" "this" {
-  project_id      = var.project_id
-  name            = var.project_id
+  project_id      = "prj-tpcds-${random_string.this.result}"
+  name            = "prj-tpcds-${random_string.this.result}"
   org_id          = var.org_id
   folder_id       = var.folder_id
   billing_account = var.billing_account_id
@@ -23,6 +23,13 @@ resource "google_project_service" "bigquery_api" {
 resource "google_project_service" "compute_api" {
   project                    = google_project.this.project_id
   service                    = "compute.googleapis.com"
+  disable_dependent_services = false
+  disable_on_destroy         = false
+}
+
+resource "google_project_service" "storage_api" {
+  project                    = google_project.this.project_id
+  service                    = "storage.googleapis.com"
   disable_dependent_services = false
   disable_on_destroy         = false
 }
@@ -69,7 +76,7 @@ resource "google_service_account" "vm_service_account" {
 
 resource "google_compute_instance" "vm_instance" {
   project      = google_project.this.project_id
-  name         = "terraform-instance"
+  name         = "vm-tpcds-${random_string.this.result}"
   machine_type = "n2-standard-2"
   zone         = "${var.region}-a"
 
@@ -121,5 +128,40 @@ resource "google_project_iam_binding" "vm_sa_binding" {
 
   members = [
     "serviceAccount:${google_service_account.vm_service_account.email}",
+  ]
+}
+
+resource "google_project_iam_binding" "vm_sa_storage_binding_0" {
+  project = google_project.this.project_id
+  role    = "roles/storage.objectAdmin"
+
+  members = [
+    "serviceAccount:${google_service_account.vm_service_account.email}",
+  ]
+}
+
+resource "google_project_iam_binding" "vm_sa_storage_binding_1" {
+  project = google_project.this.project_id
+  role    = "roles/storage.admin"
+
+  members = [
+    "serviceAccount:${google_service_account.vm_service_account.email}",
+  ]
+}
+
+resource "random_string" "this" {
+  length  = 5
+  special = false
+  upper   = false
+}
+
+resource "google_storage_bucket" "default" {
+  project       = google_project.this.project_id
+  name          = "bkt-tpcds-${random_string.this.result}"
+  location      = var.region
+  force_destroy = true
+
+  depends_on = [
+    google_project_service.storage_api
   ]
 }

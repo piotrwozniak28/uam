@@ -3,11 +3,6 @@ variable "billing_account_id" {
   type        = string
 }
 
-variable "project_id" {
-  description = "The desired ID for the GCP project."
-  type        = string
-}
-
 variable "org_id" {
   description = "The organization ID to create the project under. e.g. '123456789012'"
   type        = string

@@ -10,18 +10,13 @@
 sudo add-apt-repository ppa:ubuntu-toolchain-r/ppa -y
 sudo apt update
 sudo apt install -y unzip make g++-9 gcc-9
-make CC=gcc-9
-
-mkdir -p "~/data/tpc_ds"
-./dsdgen -scale 1 -dir /home/e_prwk/data/tpc_ds -TERMINATE N -parallel 2 -child 1 &
-./dsdgen -scale 1 -dir /home/e_prwk/data/tpc_ds -TERMINATE N -parallel 2 -child 2
-
-
-
-
+# upload & unzip the tpcds .zip package
+cd "DSGen-software-code-4.0.0/tools/"
 mkdir -p "${HOME}/data/tpc_ds"
+make CC=gcc-9
 ./dsdgen -scale 1 -dir "${HOME}/data/tpc_ds" -TERMINATE N -parallel 10 -child 1 &
-
+# watch du -shc "${HOME}/data/tpc_ds"
+cd "${HOME}/data/tpc_ds"
 
 tpcds_sort() {
     local _regex _file _dir_name _dry_run
@@ -66,3 +61,6 @@ tpcds_sort() {
         echo "--- Dry Run Complete ---"
     fi
 }
+
+tpcds_sort
+gcloud storage cp -r . gs://bkt-tpcds-l19
