@@ -77,7 +77,7 @@ resource "google_compute_instance" "vm_instance" {
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-11"
+      image = "ubuntu-os-cloud/ubuntu-2404-lts-amd64"
       size  = 20
       type  = "pd-standard"
       labels = {
@@ -91,8 +91,9 @@ resource "google_compute_instance" "vm_instance" {
   }
 
   network_interface {
-    network    = google_compute_network.vpc_network.name
-    subnetwork = google_compute_subnetwork.subnet.name
+    network            = google_compute_network.vpc_network.name
+    subnetwork         = google_compute_subnetwork.subnet.name
+    subnetwork_project = google_project.this.project_id
 
     access_config {}
   }
