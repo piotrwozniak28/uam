@@ -131,7 +131,7 @@ resource "google_project_iam_binding" "vm_sa_binding" {
   ]
 }
 
-resource "google_project_iam_binding" "vm_sa_storage_binding_0" {
+resource "google_project_iam_binding" "vm_sa_binding_0" {
   project = google_project.this.project_id
   role    = "roles/storage.objectAdmin"
 
@@ -140,9 +140,18 @@ resource "google_project_iam_binding" "vm_sa_storage_binding_0" {
   ]
 }
 
-resource "google_project_iam_binding" "vm_sa_storage_binding_1" {
+resource "google_project_iam_binding" "vm_sa_binding_1" {
   project = google_project.this.project_id
   role    = "roles/storage.admin"
+
+  members = [
+    "serviceAccount:${google_service_account.vm_service_account.email}",
+  ]
+}
+
+resource "google_project_iam_binding" "vm_sa_binding_2" {
+  project = google_project.this.project_id
+  role    = "roles/serviceusage.serviceUsageConsumer"
 
   members = [
     "serviceAccount:${google_service_account.vm_service_account.email}",
@@ -164,4 +173,13 @@ resource "google_storage_bucket" "default" {
   depends_on = [
     google_project_service.storage_api
   ]
+}
+
+resource "local_file" "tpc_ds_script" {
+  content = templatefile("${path.module}/templates/tpc_ds.sh.tftpl", {
+    project_id  = google_project.this.project_id
+    bucket_name = google_storage_bucket.default.name
+  })
+  filename        = "${path.module}/templates/tpc_ds.sh"
+  file_permission = "0755"
 }
