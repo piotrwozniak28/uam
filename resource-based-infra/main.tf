@@ -42,6 +42,9 @@ resource "google_project_service" "datalineage_api" {
 }
 
 resource "google_bigquery_dataset" "this" {
+  depends_on = [
+    google_project_service.bigquery_api
+  ]
   for_each = toset(var.bq_dataset_names)
 
   project    = google_project.this.project_id
@@ -55,9 +58,7 @@ resource "google_bigquery_dataset" "this" {
     managed-by  = "terraform"
   }
 
-  depends_on = [
-    google_project_service.bigquery_api
-  ]
+  delete_contents_on_destroy = true
 }
 
 resource "google_compute_network" "vpc_network" {
