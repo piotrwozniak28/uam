@@ -20,6 +20,13 @@ resource "google_project_service" "bigquery_api" {
   disable_on_destroy         = false
 }
 
+resource "google_project_service" "compute_api" {
+  project                    = google_project.this.project_id
+  service                    = "compute.googleapis.com"
+  disable_dependent_services = false
+  disable_on_destroy         = false
+}
+
 resource "google_bigquery_dataset" "this" {
   for_each = toset(var.bq_dataset_names)
 
@@ -27,7 +34,6 @@ resource "google_bigquery_dataset" "this" {
   dataset_id = each.key
   location   = var.region
 
-  # friendly_name = each.key
   description = "Dataset ${each.key} managed by Terraform"
 
   labels = {
@@ -37,5 +43,82 @@ resource "google_bigquery_dataset" "this" {
 
   depends_on = [
     google_project_service.bigquery_api
+  ]
+}
+
+resource "google_compute_network" "vpc_network" {
+  project                 = google_project.this.project_id
+  name                    = "terraform-network"
+  auto_create_subnetworks = false
+  depends_on              = [google_project_service.compute_api]
+}
+
+resource "google_compute_subnetwork" "subnet" {
+  project       = google_project.this.project_id
+  name          = "terraform-subnet"
+  ip_cidr_range = "10.0.0.0/24"
+  region        = var.region
+  network       = google_compute_network.vpc_network.id
+}
+
+resource "google_service_account" "vm_service_account" {
+  project      = google_project.this.project_id
+  account_id   = "vm-service-account"
+  display_name = "Service Account for VM Instance"
+}
+
+resource "google_compute_instance" "vm_instance" {
+  project      = google_project.this.project_id
+  name         = "terraform-instance"
+  machine_type = "n2-standard-2"
+  zone         = "${var.region}-a"
+
+  tags = ["web", "terraform"]
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-11"
+      size  = 20
+      type  = "pd-standard"
+      labels = {
+        environment = "data-platform"
+      }
+    }
+  }
+
+  scratch_disk {
+    interface = "NVME"
+  }
+
+  network_interface {
+    network    = google_compute_network.vpc_network.name
+    subnetwork = google_compute_subnetwork.subnet.name
+
+    access_config {}
+  }
+
+  metadata = {
+    environment = "data-platform"
+    managed-by  = "terraform"
+  }
+
+  metadata_startup_script = "echo 'Hello from Terraform' > /startup_log.txt"
+
+  service_account {
+    email  = google_service_account.vm_service_account.email
+    scopes = ["cloud-platform"]
+  }
+
+  depends_on = [
+    google_project_service.compute_api
+  ]
+}
+
+resource "google_project_iam_binding" "vm_sa_binding" {
+  project = google_project.this.project_id
+  role    = "roles/compute.viewer"
+
+  members = [
+    "serviceAccount:${google_service_account.vm_service_account.email}",
   ]
 }
