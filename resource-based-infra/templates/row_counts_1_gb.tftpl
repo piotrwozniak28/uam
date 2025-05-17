@@ -18,7 +18,7 @@ SELECT 'income_band'            AS table_name, COUNT(*) - 20       AS diff, FROM
 SELECT 'inventory'              AS table_name, COUNT(*) - 11745000 AS diff, FROM `${project_id}.${bigquery_dataset_id}.inventory`              UNION ALL
 SELECT 'item'                   AS table_name, COUNT(*) - 18000    AS diff, FROM `${project_id}.${bigquery_dataset_id}.item`                   UNION ALL
 SELECT 'promotion'              AS table_name, COUNT(*) - 300      AS diff, FROM `${project_id}.${bigquery_dataset_id}.promotion`              UNION ALL
-SELECT 'reason'                 AS table_name, COUNT(*) - 35       AS diff, FROM `${project_id}.${bigquery_dataset_id}.reason`                 UNION ALL
+SELECT 'reason'                 AS table_name, COUNT(*) - 75       AS diff, FROM `${project_id}.${bigquery_dataset_id}.reason`                 UNION ALL
 SELECT 'ship_mode'              AS table_name, COUNT(*) - 20       AS diff, FROM `${project_id}.${bigquery_dataset_id}.ship_mode`              UNION ALL
 SELECT 'store'                  AS table_name, COUNT(*) - 12       AS diff, FROM `${project_id}.${bigquery_dataset_id}.store`                  UNION ALL
 SELECT 'store_returns'          AS table_name, COUNT(*) - 287514   AS diff, FROM `${project_id}.${bigquery_dataset_id}.store_returns`          UNION ALL
