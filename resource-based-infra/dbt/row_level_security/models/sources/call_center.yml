@@ -1,0 +1,76 @@
+# Example file: models/sources.yml or models/tpcds_sources.yml
+
+version: 2
+
+sources:
+  - name: tpcds_raw # This is an arbitrary but descriptive name for this group of sources
+    description: "Raw TPC-DS data loaded into BigQuery."
+    database: prj-tpcds-qpzo1 # Your GCP Project ID
+    schema: bqd_tpcds_100 # The BigQuery Dataset ID
+    tables:
+      - name: call_center # The ACTUAL name of your table in BigQuery
+        description: "Preexisting call center dimension table from TPC-DS."
+        # You can optionally list columns here for documentation and to add tests
+        # This is highly recommended for production projects.
+        columns:
+          - name: cc_call_center_sk
+            description: "Surrogate key for the call center."
+            tests:
+              - unique
+              - not_null
+          - name: cc_call_center_id
+            description: "Business identifier for the call center."
+            tests:
+              - not_null
+          - name: cc_rec_start_date
+            description: "Record start date."
+          - name: cc_rec_end_date
+            description: "Record end date."
+          - name: cc_closed_date_sk
+            description: "Foreign key to date dimension for closed date."
+          - name: cc_open_date_sk
+            description: "Foreign key to date dimension for open date."
+          - name: cc_name
+            description: "Name of the call center."
+          - name: cc_class
+            description: "Class of the call center."
+          - name: cc_employees
+            description: "Number of employees."
+          - name: cc_sq_ft
+            description: "Square footage."
+          - name: cc_hours
+            description: "Operating hours."
+          - name: cc_manager
+            description: "Manager of the call center."
+          - name: cc_mkt_id
+            description: "Market ID."
+          - name: cc_mkt_class
+            description: "Market class."
+          - name: cc_mkt_desc
+            description: "Market description."
+          - name: cc_market_manager
+            description: "Market manager."
+          - name: cc_division
+            description: "Division ID."
+          - name: cc_division_name
+            description: "Division name."
+          - name: cc_company
+            description: "Company ID."
+          - name: cc_company_name
+            description: "Company name."
+          - name: cc_street_number
+          - name: cc_street_name
+          - name: cc_street_type
+          - name: cc_suite_number
+          - name: cc_city
+          - name: cc_county
+          - name: cc_state
+          - name: cc_zip
+          - name: cc_country
+          - name: cc_gmt_offset
+          - name: cc_tax_percentage
+        # You can also add freshness checks if you have a load timestamp column
+        # loaded_at_field: _your_load_timestamp_column # if you have one
+        # freshness:
+        #   warn_after: {count: 12, period: hour}
+        #   error_after: {count: 24, period: hour}

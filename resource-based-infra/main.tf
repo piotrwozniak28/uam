@@ -41,6 +41,13 @@ resource "google_project_service" "datalineage_api" {
   disable_on_destroy         = false
 }
 
+resource "google_project_service" "datacatalog_api" {
+  project                    = google_project.this.project_id
+  service                    = "datacatalog.googleapis.com"
+  disable_dependent_services = false
+  disable_on_destroy         = false
+}
+
 resource "google_bigquery_dataset" "this" {
   depends_on = [
     google_project_service.bigquery_api
@@ -228,5 +235,22 @@ resource "local_file" "tpc_ds_script3" {
     ][0]
   })
   filename        = "${path.module}/templates/row_counts_1_gb.tmp.sql"
+  file_permission = "0755"
+}
+
+resource "local_file" "dbt_profiles" {
+  content = templatefile("${path.module}/templates/profiles.yml.tftpl", {
+    project_id = google_project.this.project_id
+    region     = var.region
+  })
+  filename        = "${path.module}/dbt/row_level_security/profiles.yml"
+  file_permission = "0755"
+}
+
+resource "local_file" "helpers" {
+  content = templatefile("${path.module}/templates/helpers.sh.tftpl", {
+    project_id = google_project.this.project_id
+  })
+  filename        = "${path.module}/templates/helpers.sh"
   file_permission = "0755"
 }
