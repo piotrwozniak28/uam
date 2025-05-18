@@ -50,6 +50,16 @@ output "google_data_catalog_policy_tag_pii" {
 #   value = google_data_catalog_policy_tag.child_policy2
 # }
 
+resource "google_bigquery_datapolicy_data_policy" "data_policy" {
+  location         = var.region
+  data_policy_id   = "bq_data_policy_pii"
+  policy_tag       = google_data_catalog_policy_tag.this.id
+  data_policy_type = "DATA_MASKING_POLICY"
+  data_masking_policy {
+    predefined_expression = "SHA256"
+  }
+}
+
 output "z_helper_urls" {
   value = [
     "https://console.cloud.google.com/bigquery/policy-tags/locations/${var.region}/taxonomies/${basename(google_data_catalog_taxonomy.this.id)};container=${google_project.this.project_id}",
