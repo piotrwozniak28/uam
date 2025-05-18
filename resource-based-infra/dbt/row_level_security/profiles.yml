@@ -6,7 +6,7 @@ row_level_security:
     # 'dev' is the name of a specific target environment (e.g., development).
     dev:
       type: bigquery # Specifies the adapter for Google BigQuery.
-      dataset: bqd_rls # The default BigQuery dataset dbt will write models to.
+      dataset: bqd # The default BigQuery dataset dbt will write models to.
       job_execution_timeout_seconds: 300 # Max time (5 mins) a BigQuery job can run before dbt times it out.
       job_retries: 1 # How many times dbt will retry a failed BigQuery job.
       location: europe-central2 # The Google Cloud region where BigQuery jobs will run.

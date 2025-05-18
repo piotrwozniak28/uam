@@ -205,7 +205,7 @@ resource "local_file" "tpc_ds_script1" {
     bucket_name = google_storage_bucket.default.name
     bigquery_dataset_id = [
       for dataset_id in var.bq_dataset_names : dataset_id
-      if can(regex(".*tpcds.*", dataset_id))
+      if can(regex("bqd_tpcds_100_source_data*", dataset_id))
     ][0]
   })
   filename        = "${path.module}/templates/tpc_ds_load_native_noauto.tmp.sh"
@@ -218,7 +218,7 @@ resource "local_file" "tpc_ds_script2" {
     bucket_name = google_storage_bucket.default.name
     bigquery_dataset_id = [
       for dataset_id in var.bq_dataset_names : dataset_id
-      if can(regex(".*tpcds.*", dataset_id))
+      if can(regex("bqd_tpcds_100_source_data*", dataset_id))
     ][0]
   })
   filename        = "${path.module}/templates/row_counts_1_gb_meta.tmp.sql"
@@ -231,7 +231,7 @@ resource "local_file" "tpc_ds_script3" {
     bucket_name = google_storage_bucket.default.name
     bigquery_dataset_id = [
       for dataset_id in var.bq_dataset_names : dataset_id
-      if can(regex(".*tpcds.*", dataset_id))
+      if can(regex("bqd_tpcds_100_source_data*", dataset_id))
     ][0]
   })
   filename        = "${path.module}/templates/row_counts_1_gb.tmp.sql"
@@ -244,7 +244,7 @@ resource "local_file" "query34" {
     bucket_name = google_storage_bucket.default.name
     bigquery_dataset_id = [
       for dataset_id in var.bq_dataset_names : dataset_id
-      if can(regex(".*tpcds.*", dataset_id))
+      if can(regex("bqd_tpcds_100_source_data*", dataset_id))
     ][0]
   })
   filename        = "${path.module}/templates/query34.tmp.sql"
@@ -268,20 +268,42 @@ resource "local_file" "helpers" {
   file_permission = "0755"
 }
 
-resource "google_project_iam_binding" "user_browser_role" {
+resource "google_bigquery_dataset_iam_member" "dataset_reader" {
   project = google_project.this.project_id
-  role    = "roles/browser"
+  dataset_id = [
+    for dataset_id in var.bq_dataset_names : dataset_id
+    if can(regex(".*bqd_tpcds_200_query_results.*", dataset_id))
+  ][0]
+  role   = "roles/bigquery.dataViewer"
+  member = "user:gftdummyuser100@customcloudsolutions.pl"
 
-  members = [
-    "user:gftdummyuser100@customcloudsolutions.pl",
+  depends_on = [
+    google_bigquery_dataset.this
   ]
 }
 
-resource "google_project_iam_binding" "user_bigquery_user_role" {
+resource "google_bigquery_dataset_iam_member" "dataset_metadata_viewer" {
   project = google_project.this.project_id
-  role    = "roles/bigquery.user"
+  dataset_id = [
+    for dataset_id in var.bq_dataset_names : dataset_id
+    if can(regex(".*bqd_tpcds_200_query_results.*", dataset_id))
+  ][0]
+  role   = "roles/bigquery.metadataViewer"
+  member = "user:gftdummyuser100@customcloudsolutions.pl"
 
-  members = [
-    "user:gftdummyuser100@customcloudsolutions.pl",
+  depends_on = [
+    google_bigquery_dataset.this
   ]
+}
+
+resource "google_project_iam_member" "user_bigquery_job_user" {
+  project = google_project.this.project_id
+  role    = "roles/bigquery.jobUser"
+  member  = "user:gftdummyuser100@customcloudsolutions.pl"
+}
+
+resource "google_project_iam_member" "user_minimal_browser" {
+  project = google_project.this.project_id
+  role    = "roles/browser"
+  member  = "user:gftdummyuser100@customcloudsolutions.pl"
 }

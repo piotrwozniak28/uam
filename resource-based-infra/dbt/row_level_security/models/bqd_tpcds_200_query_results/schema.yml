@@ -15,16 +15,12 @@ models:
       - name: c_salutation
         description: "Customer's salutation (e.g., Mr., Ms.)."
         policy_tags:
-          - "projects/prj-tpcds-qpzo1/locations/europe-central2/taxonomies/3757062118254075444/policyTags/455534254018465411"
       - name: c_preferred_cust_flag
         description: "Flag indicating if the customer is a preferred customer."
         policy_tags:
-          - "projects/prj-tpcds-qpzo1/locations/europe-central2/taxonomies/3757062118254075444/policyTags/455534254018465411"
       - name: ss_ticket_number
         description: "Store sales ticket number."
         policy_tags:
-          - "projects/prj-tpcds-qpzo1/locations/europe-central2/taxonomies/3757062118254075444/policyTags/455534254018465411"
       - name: cnt
         description: "Count of occurrences for the frequent shopper criteria."
         policy_tags:
-          - "projects/prj-tpcds-qpzo1/locations/europe-central2/taxonomies/3757062118254075444/policyTags/455534254018465411"
