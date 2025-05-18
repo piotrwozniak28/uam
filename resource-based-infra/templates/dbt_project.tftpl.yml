@@ -104,6 +104,6 @@ vars:
     - "group:superusers@customcloudsolutions.pl"
     # - "serviceAccount:sa@prj.iam.gserviceaccount.com"
 
-  TAXONOMY_ID: "projects/prj-tpcds-qpzo1/locations/europe-central2/taxonomies/4120427680433657551"
-  PT_PII_DATA: "projects/prj-tpcds-qpzo1/locations/europe-central2/taxonomies/4120427680433657551/policyTags/8411158307609133193"
-  PT_EMAIL: "projects/prj-tpcds-qpzo1/locations/europe-central2/taxonomies/4120427680433657551/policyTags/5965262539900800954"
+  TAXONOMY_ID: "${taxonomy_id}"
+  PT_PII_DATA: "${pt_pii_data}"
+  PT_EMAIL: "${pt_email}"

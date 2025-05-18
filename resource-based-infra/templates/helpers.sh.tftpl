@@ -12,4 +12,5 @@ while read -r DATASET_ID; do
             # echo "  WOULD DELETE: $${OBJECT_ID} (Dry Run)"
             bq rm -f --table "$${OBJECT_ID}"
         done
+    # bq rm --project_id=${project_id} -r -f "$${DATASET_ID}"         
 done

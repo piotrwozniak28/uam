@@ -12,45 +12,8 @@ resource "google_data_catalog_policy_tag" "this" {
   description  = "Policy tag for Personally Identifiable Information (PII) that requires controlled access"
 }
 
-# resource "google_data_catalog_policy_tag" "child_policy" {
-#   taxonomy          = google_data_catalog_taxonomy.this.id
-#   display_name      = "ssn"
-#   description       = "A hash of the users ssn"
-#   parent_policy_tag = google_data_catalog_policy_tag.parent_policy.id
-# }
-
-# resource "google_data_catalog_policy_tag" "child_policy2" {
-#   taxonomy          = google_data_catalog_taxonomy.this.id
-#   display_name      = "dob"
-#   description       = "The users date of birth"
-#   parent_policy_tag = google_data_catalog_policy_tag.parent_policy.id
-#   // depends_on to avoid concurrent delete issues
-#   depends_on = [google_data_catalog_policy_tag.child_policy]
-# }
-
-# Grant fine-grained reader access to the user on the PII policy tag
-# resource "google_data_catalog_policy_tag_iam_member" "pii_reader" {
-#   policy_tag = google_data_catalog_policy_tag.this.id
-#   role       = "roles/datacatalog.categoryFineGrainedReader"
-#   member     = "user:gftdummyuser100@customcloudsolutions.pl"
-# }
-
-output "google_data_catalog_taxonomy" {
-  value = google_data_catalog_taxonomy.this
-}
-
-output "google_data_catalog_policy_tag_pii" {
-  value       = google_data_catalog_policy_tag.this
-  description = "Policy tag for PII data that requires controlled access"
-}
-# output "google_data_catalog_policy_tag_child_policy" {
-#   value = google_data_catalog_policy_tag.child_policy
-# }
-# output "google_data_catalog_policy_tag_child_policy2" {
-#   value = google_data_catalog_policy_tag.child_policy2
-# }
-
-resource "google_bigquery_datapolicy_data_policy" "data_policy" {
+resource "google_bigquery_datapolicy_data_policy" "this" {
+  project          = google_project.this.project_id
   location         = var.region
   data_policy_id   = "bq_data_policy_pii"
   policy_tag       = google_data_catalog_policy_tag.this.id
@@ -60,8 +23,35 @@ resource "google_bigquery_datapolicy_data_policy" "data_policy" {
   }
 }
 
-output "z_helper_urls" {
-  value = [
-    "https://console.cloud.google.com/bigquery/policy-tags/locations/${var.region}/taxonomies/${basename(google_data_catalog_taxonomy.this.id)};container=${google_project.this.project_id}",
-  ]
+resource "google_bigquery_datapolicy_data_policy_iam_member" "member" {
+  project        = google_project.this.project_id
+  location       = google_bigquery_datapolicy_data_policy.this.location
+  data_policy_id = google_bigquery_datapolicy_data_policy.this.data_policy_id
+  role           = "roles/bigquerydatapolicy.maskedReader"
+  member         = "user:gftdummyuser100@customcloudsolutions.pl"
+}
+
+resource "google_data_catalog_policy_tag" "email" {
+  taxonomy     = google_data_catalog_taxonomy.this.id
+  display_name = "EMAIL"
+  description  = "Policy tag for email addresses that requires controlled access"
+}
+
+resource "google_bigquery_datapolicy_data_policy" "email" {
+  project          = google_project.this.project_id
+  location         = var.region
+  data_policy_id   = "bq_data_policy_email"
+  policy_tag       = google_data_catalog_policy_tag.email.id
+  data_policy_type = "DATA_MASKING_POLICY"
+  data_masking_policy {
+    predefined_expression = "EMAIL_MASK"
+  }
+}
+
+resource "google_bigquery_datapolicy_data_policy_iam_member" "email" {
+  project        = google_project.this.project_id
+  location       = google_bigquery_datapolicy_data_policy.email.location
+  data_policy_id = google_bigquery_datapolicy_data_policy.email.data_policy_id
+  role           = "roles/bigquerydatapolicy.maskedReader"
+  member         = "user:gftdummyuser100@customcloudsolutions.pl"
 }

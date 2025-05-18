@@ -264,7 +264,18 @@ resource "local_file" "helpers" {
   content = templatefile("${path.module}/templates/helpers.sh.tftpl", {
     project_id = google_project.this.project_id
   })
-  filename        = "${path.module}/templates/helpers.sh"
+  filename        = "${path.module}/templates/helpers.tmp.sh"
+  file_permission = "0755"
+}
+
+resource "local_file" "dbt_project" {
+  content = templatefile("${path.module}/templates/dbt_project.tftpl.yml", {
+    project_id  = google_project.this.project_id
+    taxonomy_id = google_data_catalog_taxonomy.this.id
+    pt_pii_data = google_data_catalog_policy_tag.this.id
+    pt_email    = google_data_catalog_policy_tag.email.id
+  })
+  filename        = "${path.module}/dbt/row_level_security/dbt_project.yml"
   file_permission = "0755"
 }
 
