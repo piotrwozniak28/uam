@@ -1,10 +1,9 @@
 gcloud auth application-default set-quota-project "prj-tpcds-qpzo1"
 
-
 bq ls --project_id "prj-tpcds-qpzo1" --format=json | jq -r '.[].datasetReference.datasetId' | \
 while read -r DATASET_ID; do
     echo "Processing dataset: prj-tpcds-qpzo1:${DATASET_ID}"
-    bq ls -n 0 --format=json "prj-tpcds-qpzo1:${DATASET_ID}" | \
+    bq ls --format=json "prj-tpcds-qpzo1:${DATASET_ID}" | \
         jq -r '.[] | select(.type=="TABLE" or .type=="VIEW") | .id' | \
         while read -r OBJECT_ID; do
             echo "  Deleting: ${OBJECT_ID}"
@@ -14,4 +13,3 @@ while read -r DATASET_ID; do
             bq rm -f --table "${OBJECT_ID}"
         done
 done
-

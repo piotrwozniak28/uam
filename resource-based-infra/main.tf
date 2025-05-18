@@ -181,7 +181,7 @@ resource "random_string" "this" {
 
 resource "google_storage_bucket" "default" {
   project       = google_project.this.project_id
-  name          = "bkt-tpcds-${random_string.this.result}"
+  name          = "bkt-tpcds-source-data-${random_string.this.result}"
   location      = var.region
   force_destroy = true
 
@@ -238,6 +238,19 @@ resource "local_file" "tpc_ds_script3" {
   file_permission = "0755"
 }
 
+resource "local_file" "query34" {
+  content = templatefile("${path.module}/templates/query34.sql.tftpl", {
+    project_id  = google_project.this.project_id
+    bucket_name = google_storage_bucket.default.name
+    bigquery_dataset_id = [
+      for dataset_id in var.bq_dataset_names : dataset_id
+      if can(regex(".*tpcds.*", dataset_id))
+    ][0]
+  })
+  filename        = "${path.module}/templates/query34.tmp.sql"
+  file_permission = "0755"
+}
+
 resource "local_file" "dbt_profiles" {
   content = templatefile("${path.module}/templates/profiles.yml.tftpl", {
     project_id = google_project.this.project_id
@@ -253,4 +266,22 @@ resource "local_file" "helpers" {
   })
   filename        = "${path.module}/templates/helpers.sh"
   file_permission = "0755"
+}
+
+resource "google_project_iam_binding" "user_browser_role" {
+  project = google_project.this.project_id
+  role    = "roles/browser"
+
+  members = [
+    "user:gftdummyuser100@customcloudsolutions.pl",
+  ]
+}
+
+resource "google_project_iam_binding" "user_bigquery_user_role" {
+  project = google_project.this.project_id
+  role    = "roles/bigquery.user"
+
+  members = [
+    "user:gftdummyuser100@customcloudsolutions.pl",
+  ]
 }

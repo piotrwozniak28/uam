@@ -28,17 +28,13 @@ resource "google_data_catalog_policy_tag" "this" {
 #   depends_on = [google_data_catalog_policy_tag.child_policy]
 # }
 
-
-
-
-
 output "google_data_catalog_taxonomy" {
   value = google_data_catalog_taxonomy.this
 }
 
-# output "google_data_catalog_policy_tag_parent_policy" {
-#   value = google_data_catalog_policy_tag.parent_policy
-# }
+output "google_data_catalog_policy_tag" {
+  value = google_data_catalog_policy_tag.this
+}
 # output "google_data_catalog_policy_tag_child_policy" {
 #   value = google_data_catalog_policy_tag.child_policy
 # }

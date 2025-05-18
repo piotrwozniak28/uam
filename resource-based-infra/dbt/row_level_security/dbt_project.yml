@@ -34,27 +34,28 @@ models:
 
     # Configurations for models located in 'models/200_authorized_views/'
     bqd_rls_200_authorized_views:
-      +materialized: view # Models in this subdirectory will be created as views by default.
-      +schema:
-        bqd_rls_200_authorized_views # IMPORTANT: Models here will be written to the BigQuery dataset
-        # '200_authorized_views' within your 'prj-tpcds-qpzo1' project.
-        # This OVERRIDES the default 'dataset: bqd_rls' from your profiles.yml
-        # for models in this specific path.
+      +materialized: view
+      +schema: bqd_rls_200_authorized_views
 
-    # Configurations for models located in 'models/300_rap_basic/'
-    300_rap_basic:
-      +materialized: table # Models in this subdirectory will be created as tables by default.
-      +schema: bqd_rls_300_rap_basic # Models here will be written to the BigQuery dataset '300_rap_basic'.
-
-    # Configurations for models located in 'models/400_rap_lookup_no_hash/'
-    400_rap_lookup_no_hash:
+    bqd_rls_300_rap_basic:
       +materialized: table
-      +schema: bqd_rls_400_rap_lookup_no_hash # Models here will be written to '400_rap_lookup_no_hash' dataset.
+      +schema: bqd_rls_300_rap_basic
 
-    # Configurations for models located in 'models/500_rap_lookup_hash/'
-    500_rap_lookup_hash:
+    bqd_rls_400_rap_lookup_no_hash:
       +materialized: table
-      +schema: bqd_rls_500_rap_lookup_hash # Models here will be written to '500_rap_lookup_hash' dataset.
+      +schema: bqd_rls_400_rap_lookup_no_hash
+
+    bqd_rls_500_rap_lookup_hash:
+      +materialized: table
+      +schema: bqd_rls_500_rap_lookup_hash
+
+    bqd_tpcds_200_query_results:
+      +persist_docs:
+        relation: true
+        columns: true
+      +materialized: view
+      +schema: bqd_tpcds_200_query_results
+      +tags: ["tpcds"]
 
 # --- Seed Configurations ---
 # Similar to models, this configures how your CSV seed files are loaded.
